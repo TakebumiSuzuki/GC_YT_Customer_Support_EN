@@ -1,0 +1,19 @@
+[server]
+port = 8501
+
+[theme]
+# The preset Streamlit theme that your custom theme inherits from.
+# One of "light" or "dark".
+base = "dark"
+
+# Primary accent color for interactive elements.
+primaryColor = "#D6E9FF"
+
+# Background color for the main content area.
+backgroundColor = "#FFFFFF"
+
+# Background color used for the sidebar and most interactive widgets.
+secondaryBackgroundColor = "#EEF2FF"
+
+# Color used for almost all text.
+textColor = "#31333F"
