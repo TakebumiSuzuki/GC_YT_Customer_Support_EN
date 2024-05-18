@@ -33,7 +33,7 @@ def setAvatar(role):
 # Display chat messages from history on app rerun
 if message_list != []:
     for message in message_list:
-        with st.chat_message(message["role"],avatar=setAvatar(message["role"])):
+        with st.chat_message(message["role"], avatar=setAvatar(message["role"])):
             st.markdown(message["content"])
             # if message["role"] == "AI":
             #     st.button('docs履歴')
@@ -51,16 +51,24 @@ def delete_button():
 
 # Accept user input
 if input := st.chat_input(K.INPUT_HOLDER(K.lang), on_submit = delete_button):
-    # Display user message in chat message container
+
     with st.chat_message("user"):
         st.markdown(input)
+    ss["store"].append({"role" : "user", "content" : input})
+
 
     retrieved = logic.retrieve(input, ss["store"])
     ss["retrived_text"] = retrieved[0]
-    logic.invoke(input, retrieved[1], ss["store"])
+    answer = logic.invoke(input, retrieved[1], ss["store"])
+
+
+    with st.chat_message("AI", avatar=setAvatar("AI")):
+        st.markdown(answer)
+    ss["store"].append({"role" : "AI", "content" : answer})
 
     ss["show_button"] = True
     st.rerun()
+
 
 with st.sidebar:
     st.subheader(K.SIDEBAR_SUBTITLE(K.lang))

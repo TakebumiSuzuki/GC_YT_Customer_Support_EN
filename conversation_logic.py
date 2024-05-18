@@ -13,7 +13,7 @@ from langchain_chroma import Chroma
 from langchain_openai import OpenAIEmbeddings
 import cohere
 from langchain_google_genai import GoogleGenerativeAI
-from langchain_openai.chat_models import ChatOpenAI
+# from langchain_openai.chat_models import ChatOpenAI
 
 
 embeddings_model = OpenAIEmbeddings(
@@ -39,10 +39,10 @@ gemini = GoogleGenerativeAI(
         google_api_key = os.getenv(K.GEMINI_API_KEY)
 )
 
-llm = ChatOpenAI(
-    model = K.OPENAI_MODEL_NAME ,
-    temperature = K.OPENAI_TEMP,
-)
+# llm = ChatOpenAI(
+#     model = K.OPENAI_MODEL_NAME ,
+#     temperature = K.OPENAI_TEMP,
+# )
 
 def retrieve(inputText, store):
 
@@ -65,7 +65,7 @@ def retrieve(inputText, store):
     for doc in docs:
         text = doc.page_content
         source_text += text + '\n---\n'
-
+    print("get the docs through the retrieval")
     return source_text, docs
 
 
@@ -84,12 +84,12 @@ def invoke(inputText, docs, store):
             ("user", "{input}")]
             )
 
-    question_answer_chain = create_stuff_documents_chain(llm, qa_prompt)
+    question_answer_chain = create_stuff_documents_chain(gemini, qa_prompt)
 
-    answer = question_answer_chain.invoke({"input": inputText, "context": docs, "language": language})
+    return question_answer_chain.invoke({"input": inputText, "context": docs, "language": language})
 
-    store.append({"role" : "user", "content" : inputText})
-    store.append({"role" : "AI", "content" : answer})
+
+
 
 
 
