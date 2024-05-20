@@ -9,35 +9,36 @@ from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain_core.chat_history import BaseChatMessageHistory
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
-from langchain_chroma import Chroma
-from langchain_openai import OpenAIEmbeddings
-import cohere
 from langchain_google_genai import GoogleGenerativeAI
 # from langchain_openai.chat_models import ChatOpenAI
 
-
-embeddings_model = OpenAIEmbeddings(
-    model = K.EMBEDDING_MODEL_NAME,
-    api_key = os.getenv(K.OPENAI_API_KEY)
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
+embeddings_model = GoogleGenerativeAIEmbeddings(
+    model="models/text-embedding-004",
+    task_type="RETRIEVAL_QUERY"
 )
 
-vectorstore = Chroma(
-    persist_directory = (
-        K.EN_VECSTORE if K.lang == "EN" else
-        K.JA_VECSTORE
-    ),
-    embedding_function = embeddings_model
-)
+from langchain_community.vectorstores import FAISS
+db = FAISS.load_local("en_0508_faiss.db", embeddings_model, allow_dangerous_deserialization = True)
 
-retriever = vectorstore.as_retriever(
+# vectorstore = Chroma(
+#     persist_directory = (
+#         K.EN_VECSTORE if K.lang == "EN" else
+#         K.JA_VECSTORE
+#     ),
+#     embedding_function = embeddings_model
+# )
+
+retriever = db.as_retriever(
     search_type = K.SEARCH_TYPE,
     search_kwargs = {'k': K.K, 'score_threshold': K.THRESH},
 )
 
 gemini = GoogleGenerativeAI(
         model = K.GEMINI_MODEL_NAME,
-        google_api_key = os.getenv(K.GEMINI_API_KEY)
+        google_api_key = os.getenv(K.GOOGLE_API_KEY)
 )
+print(gemini.invoke('Google Cloudでpythonを使ってtext embeddingをできるようにするには、何をインストールする必要がありますか'))
 
 # llm = ChatOpenAI(
 #     model = K.OPENAI_MODEL_NAME ,
