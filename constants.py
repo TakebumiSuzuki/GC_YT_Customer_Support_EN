@@ -1,4 +1,3 @@
-
 lang = "EN"
 # "JA" or "EN"
 
@@ -41,21 +40,14 @@ def SIDEBAR_SUBTITLE(l):
     )
 
 
-COHERE_API_KEY = 'COHERE_API_KEY'
-COHERE_MODEL_NAME = 'command-r-plus'
-
 GOOGLE_API_KEY = 'GOOGLE_API_KEY'
 GEMINI_MODEL_NAME = 'models/gemini-1.5-pro-latest'
-
-OPENAI_API_KEY = 'OPENAI_API_KEY'
-OPENAI_MODEL_NAME = 'gpt-4o'
-OPENAI_TEMP = 0.4
+EMBEDDING_MODEL_NAME = 'models/text-embedding-004'
 
 LANGSMITH_API_KEY = 'LANGSMITH_API_KEY'
 
-EMBEDDING_MODEL_NAME = 'text-embedding-3-large'
-EN_VECSTORE = 'data_en.chroma_db'
-JA_VECSTORE = 'data_ja.chroma_db'
+EN_VECSTORE = 'en_0508_faiss.db'
+# JA_VECSTORE = 'data_ja.chroma_db'
 SEARCH_TYPE = 'similarity_score_threshold'
 K = 4
 FETCH_K = 15
