@@ -4,6 +4,7 @@ import conversation_logic as logic
 from PIL import Image
 import time
 import random
+
 st.set_page_config(
      page_title = K.TAB_TITLE(K.lang),
      layout = "wide",
@@ -16,14 +17,10 @@ if "store" not in ss:
     ss["store"] = []
 message_list = ss["store"]
 
-
-
 st.markdown(K.CSS, unsafe_allow_html=True)
 
 st.title(K.TITLE(K.lang))
 st.write(K.SUBTITLE(K.lang))
-
-
 
 # Display chat messages from history on app rerun
 if message_list != []:
@@ -44,57 +41,60 @@ if message_list != []:
 def delete_button():
     ss["show_button"] = False
 
-
-
-
 # Accept user input
 if input := st.chat_input(K.INPUT_HOLDER(K.lang), on_submit = delete_button):
 
+    #ユーザーからのインプットをそのままUIに表示する
     with st.chat_message("user"):
         st.markdown(input)
+    #ユーザーからのインプットをsession_stateに記録
     ss["store"].append({"role" : "user", "content" : input})
 
-    full_response = ""
+
+    #AIからの返答をストリームにて取得、表示する
     with st.chat_message("AI"):
+        msg_holder = st.empty()
+        msg_holder.markdown("Searching...")
 
-        message_placeholder = st.empty()
-        message_placeholder.markdown("Thinking...")
-
-        retrieved = logic.retrieve(input, ss["store"])
+        retrieved = logic.retrieve(input)
         ss["retrived_text"] = retrieved[0]
 
-        stream = logic.get_stream(input, retrieved[1], ss["store"])
+        with st.sidebar:
+            st.subheader(K.SIDEBAR_SUBTITLE(K.lang))
+            if "retrived_text" in ss:
+                st.markdown(ss["retrived_text"])
 
-        # try:
-        #     for chunk in stream:
-        #         word_count = 0
-        #         random_int = random.randint(5,10)
-        #         for word in chunk.text:
-        #             full_response+=word
-        #             word_count+=1
-        #             if word_count == random_int:
-        #                 time.sleep(0.05)
-        #                 message_placeholder.markdown(full_response + "_")
-        #                 word_count = 0
-        #                 random_int = random.randint(5,10)
-        #     message_placeholder.write_stream(full_response)
+        msg_holder.markdown("Reading...")
+        full_response = ""
+        stream = logic.get_stream(input, retrieved[1])
+        for chunk in stream:
+            try:
+                word_count = 0
+                random_int = random.randint(5, 10)
+                for word in chunk:
+                    full_response += word
+                    word_count += 1
+                    if word_count == random_int:
+                        time.sleep(0.05)
+                        msg_holder.markdown(full_response + "_")
+                        word_count = 0
+                        random_int = random.randint(5, 10)
+            except Exception as e:
+                logic.error_handling(e)
 
-        # except Exception as e:
-        #     st.exception(e)
+        msg_holder.markdown(full_response)
 
-        # message_placeholder.markdown(stream)
-
-        final_response = message_placeholder.write_stream(stream)
-
-    ss["store"].append({"role" : "AI", "content" : final_response})
+    #AIからの返答をsession_stateに記録
+    ss["store"].append({"role" : "AI", "content" : full_response})
     ss["show_button"] = True
     st.rerun()
 
 
-with st.sidebar:
-    st.subheader(K.SIDEBAR_SUBTITLE(K.lang))
-    if "retrived_text" in ss:
-        st.markdown(ss["retrived_text"])
+else:
+    with st.sidebar:
+        st.subheader(K.SIDEBAR_SUBTITLE(K.lang))
+        if "retrived_text" in ss:
+            st.markdown(ss["retrived_text"])
 
 
 
